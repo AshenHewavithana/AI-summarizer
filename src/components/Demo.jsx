@@ -9,6 +9,7 @@ const Demo = () => {
   });
 
   const [allArticles, setAllArticles] = useState([]);
+  const [copied, setCopied] = useState("");
 
   const [getSummary, {error, isFetching}] = useLazyGetSummaryQuery();
 
@@ -32,6 +33,12 @@ const Demo = () => {
       
       localStorage.setItem('articles', JSON.stringify(updatedAllArticles));
     }
+  }
+
+  const handleCopy = (copyUrl) => {
+    setCopied(copyUrl);
+    navigator.clipboard.writeText(copyUrl);
+    setTimeout(() => setCopied(false), 3000);
   }
 
   return (
@@ -58,11 +65,14 @@ const Demo = () => {
         </form>
         {/* Browse URL History */}
         <div className='flex flex-col gap-1 max-h-60 overflow-y-auto'>
+          <div>
+            <p className='font-satoshi font-bold text-gray-600 mt-2'>Previous Articles</p>
+          </div>
           {allArticles.map((item, index) => (
             <div key={`link-${index}`} onClick={() => setArticle(item)} className='link_card'>
-              <div className='copy-btn'>
+              <div className='copy-btn' onClick={() => handleCopy(item.url)}>
                 <img
-                  src={copy}
+                  src={copied === item.url ? tick : copy}
                   alt='copy-icon'
                   className='w-[75%] h-[75%] object-contain'
                 />
@@ -94,7 +104,9 @@ const Demo = () => {
                   Article <span className='blue_gradient'>Summary</span>
                 </h2>
                 <div className='summary_box'>
-                  <p>{article.summary}</p>
+                  <p className='font-inter font-medium text-sm text-gray-700'>
+                    {article.summary}
+                  </p>
                 </div>
               </div>
             )
